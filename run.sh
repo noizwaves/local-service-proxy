@@ -58,8 +58,9 @@ while true; do
       port=$(echo $serviceLine | cut -d',' -f2)
       # TODO: replace string contains with stricter array contains
       if [[ "${ALLOW_LIST}" != "" && "${ALLOW_LIST}" == *"${name}"* ]]; then
-        echo "${serviceLine} should be running, starting..."
+        echo "${serviceLine} should be proxied, starting..."
         start_proxy $name $port
+        echo "${serviceLine} started"
       fi
     fi
   done
@@ -68,10 +69,11 @@ while true; do
   do
     # TODO: replace string contains with stricter array contains
     if [[ "${ideal_state}" != *"${serviceLine}"* ]]; then
-      echo "${serviceLine} should not be running, terminating..."
       name=$(echo $serviceLine | cut -d',' -f1)
       port=$(echo $serviceLine | cut -d',' -f2)
+      echo "${serviceLine} should not be proxied, stopping..."
       stop_proxy "${name}" "${port}"
+      echo "${serviceLine} stopped"
     fi
   done
 
