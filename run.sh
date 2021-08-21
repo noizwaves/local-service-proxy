@@ -2,6 +2,11 @@
 # Run localhost proxies direct to Kubernetes services
 #
 # usage: ./run.sh
+#
+# variables:
+# - ALLOW_LIST: space separated list of services that can be started, empty string means all can (default: "")
+
+ALLOW_LIST="${ALLOW_LIST:-}"
 
 function get_ideal_state() {
   # Configuration for Kubernetes API access
@@ -49,10 +54,13 @@ while true; do
   do
     # TODO: replace string contains with stricter array contains
     if [[ "${actual_state}" != *"${serviceLine}"* ]]; then
-      echo "${serviceLine} should be running, starting..."
       name=$(echo $serviceLine | cut -d',' -f1)
       port=$(echo $serviceLine | cut -d',' -f2)
-      start_proxy $name $port
+      # TODO: replace string contains with stricter array contains
+      if [[ "${ALLOW_LIST}" != "" && "${ALLOW_LIST}" == *"${name}"* ]]; then
+        echo "${serviceLine} should be running, starting..."
+        start_proxy $name $port
+      fi
     fi
   done
 
